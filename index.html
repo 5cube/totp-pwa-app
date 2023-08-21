@@ -1,14 +1,112 @@
 <!doctype html>
-<html lang="en">
+<html lang="ru">
   <head>
     <meta charset="UTF-8" />
-    <link rel="icon" type="image/svg+xml" href="/vite.svg" />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Vite + TS</title>
+    <title>TOTP-аутентификация</title>
+    <meta
+      name="description"
+      content="Минимальное приложение двухфакторной аутентификации(2FA)."
+    />
     <link rel="stylesheet" href="/src/index.css" />
   </head>
-  <body class="container px-4 sm:px-6">
-    <div id="app"></div>
+  <body class="container flex flex-col font-sans antialiased">
+    <header class="sticky top-0 flex h-16 items-center">
+      <div class="grow">
+        <a href="/">
+          <h1 class="inline text-lg font-semibold">TOTP-аутентификация</h1>
+        </a>
+      </div>
+      <div class="shrink-0">
+        <button
+          id="add-button"
+          aria-haspopup="true"
+          aria-label="Добавить"
+          class="hover:text-blue-600"
+        >
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            fill="none"
+            viewBox="0 0 24 24"
+            stroke-width="1.5"
+            stroke="currentColor"
+            class="h-6 w-6"
+          >
+            <path
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              d="M12 4.5v15m7.5-7.5h-15"
+            />
+          </svg>
+        </button>
+
+        <dialog
+          id="add-dialog"
+          role="dialog"
+          aria-modal="true"
+          aria-labelledby="add-dialog-label"
+          class="max-w-md rounded-xl bg-white p-6 shadow-lg backdrop:bg-white/75 backdrop:backdrop-blur"
+          @close="onDialogClose"
+        >
+          <form id="add-form" class="space-y-5">
+            <h3 id="add-dialog-label" class="text-xl font-semibold">
+              Добавить аккаунт
+            </h3>
+            <input
+              id="add-form-label"
+              type="text"
+              class="input"
+              name="add-form-label"
+              placeholder="Введите label"
+              aria-label="label input"
+              autocomplete="off"
+              required
+              minlength="3"
+              autofocus
+            />
+            <input
+              id="add-form-secret"
+              type="text"
+              class="input"
+              name="add-form-secret"
+              placeholder="Введите secret"
+              aria-label="secret input"
+              autocomplete="off"
+              required
+            />
+            <div class="space-x-4">
+              <button
+                id="add-form-cancel"
+                type="button"
+                value="cancel"
+                formmethod="dialog"
+                class="btn hover:bg-gray-50"
+              >
+                Отмена
+              </button>
+              <button
+                id="add-form-submit"
+                value="submit"
+                formmethod="dialog"
+                class="btn btn-blue"
+              >
+                Добавить
+              </button>
+            </div>
+          </form>
+        </dialog>
+      </div>
+    </header>
+
+    <main class="grow py-8">
+      <section id="accounts-list" class="grid gap-6"></section>
+    </main>
+
+    <footer class="container py-2 text-sm text-gray-500">&copy;2023</footer>
+
+    <script type="module" src="/src/db.ts"></script>
+    <script type="module" src="/src/header.ts"></script>
     <script type="module" src="/src/main.ts"></script>
   </body>
 </html>
