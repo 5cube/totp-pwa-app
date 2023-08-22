@@ -1,46 +1,27 @@
 import { getAccounts, deleteAccount } from './db.ts'
+import { timerWorker } from './main.ts'
+import type { TOTP } from './types.ts'
+
+const DEFAULT_PERIOD = 30
 
 const listSection = document.getElementById('accounts-list') as HTMLElement
-
-const PERIOD_IN_SECONDS = 30
-
-let seconds = Math.floor(
-  (new Date().getTime() % (PERIOD_IN_SECONDS * 1000)) / 1000,
-)
-
-calcSeconds(seconds)
-
-setInterval(() => {
-  const val = ++seconds
-  if (val < 2) {
-    renderList()
-  }
-  calcSeconds(val)
-}, 1000)
-
-function calcSeconds(val: number) {
-  seconds = val >= PERIOD_IN_SECONDS ? 0 : val
-
-  const items = document.querySelectorAll('countdown-timer')
-  for (const item of items) {
-    item.setAttribute('seconds', String(PERIOD_IN_SECONDS - seconds))
-  }
-}
 
 function getRandom() {
   return (Math.random() + 1).toString(36).substring(6)
 }
 
 class CountdownTimer extends HTMLElement {
-  rendered = false
+  private rendered = false
 
-  getColors(value: number) {
+  private getColors(value: number) {
     return `hsl(${value * 120},100%,40%)`
   }
 
-  render() {
+  private render() {
     const value = Number(this.getAttribute('seconds'))
-    const color = this.getColors(value / PERIOD_IN_SECONDS)
+    const period =
+      Number.parseInt(this.getAttribute('period') as string) || DEFAULT_PERIOD
+    const color = this.getColors(value / period)
     this.innerHTML = `
       <div class="relative transition-colors" style="color: ${color};">
         <svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 48 48" class="-rotate-90">
@@ -51,15 +32,15 @@ class CountdownTimer extends HTMLElement {
     `
   }
 
+  static get observedAttributes() {
+    return ['seconds', 'period']
+  }
+
   connectedCallback() {
     if (!this.rendered) {
       this.render()
       this.rendered = true
     }
-  }
-
-  static get observedAttributes() {
-    return ['seconds']
   }
 
   attributeChangedCallback() {
@@ -70,22 +51,63 @@ class CountdownTimer extends HTMLElement {
 customElements.define('countdown-timer', CountdownTimer)
 
 class AccountCard extends HTMLElement {
+  private code = ''
+  private label = ''
+  private seconds = 0
+  private period = DEFAULT_PERIOD
+
+  constructor() {
+    super()
+    this.code = getRandom()
+    this.label = this.getAttribute('label') as string
+    this.setPeriod(this.getAttribute('period'))
+    timerWorker.addEventListener('message', (e) => {
+      const seconds = e.data[this.period]
+      ;(this.querySelector('countdown-timer') as HTMLElement)?.setAttribute(
+        'seconds',
+        seconds,
+      )
+      if (seconds === this.period) {
+        this.code = getRandom()
+        const element = this.querySelector('.code')
+        if (element) {
+          element.innerHTML = this.code
+        }
+      }
+    })
+  }
+
+  private setPeriod(val: string | number | null) {
+    if (!val) {
+      return
+    }
+    this.period = Number.parseInt(val as string) || DEFAULT_PERIOD
+    timerWorker.postMessage({ period: this.period })
+    ;(this.querySelector('countdown-timer') as HTMLElement)?.setAttribute(
+      'period',
+      String(this.period),
+    )
+  }
+
+  static get observedAttributes() {
+    return ['label', 'period']
+  }
+
   connectedCallback() {
-    const label = this.getAttribute('label') as string
     this.innerHTML = `
       <div class="py-2 px-4 rounded-lg shadow flex items-center space-x-2">
         <div class="grow flex flex-col space-y-1">
-          <div>
-            ${label}
-          </div>
+          <label>
+            ${this.label}
+          </label>
           <div class="flex">
-            <div class="py-1.5 px-3 font-semibold flex items-center justify-center rounded-lg bg-gray-100 tracking-widest cursor-pointer">
-              ${getRandom()}
+            <div class="code py-1.5 px-3 font-semibold flex items-center justify-center rounded-lg bg-gray-100 tracking-widest cursor-pointer">
+              ${this.code}
             </div>
           </div>
         </div>
         <div>
-          <countdown-timer></countdown-timer>
+          <countdown-timer seconds="${this.seconds}" period="${this.period}"></countdown-timer>
         </div>
         <button class="shrink-0 hover:text-red-600">
           <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-6 h-6">
@@ -94,14 +116,31 @@ class AccountCard extends HTMLElement {
         </button>
       </div>
     `
-
-    const button = this.querySelector('button') as HTMLButtonElement
-    button.onclick = async () => {
+    ;(this.querySelector('button') as HTMLButtonElement).onclick = async () => {
       const result = confirm('Вы уверены что хотите удалить?')
       if (result) {
-        await deleteAccount(label)
+        await deleteAccount(this.label)
         await renderList()
       }
+    }
+  }
+
+  attributeChangedCallback(
+    name: string,
+    _oldValue: string | number | null,
+    newValue: string | number | null,
+  ) {
+    switch (name) {
+      case 'label':
+        this.label = newValue as string
+        const element = this.querySelector('label')
+        if (element) {
+          element.innerHTML = this.label
+        }
+        break
+      case 'period':
+        this.setPeriod(newValue)
+        break
     }
   }
 }
@@ -113,7 +152,9 @@ export async function renderList() {
   listSection.innerHTML = items
     .map((item) => {
       return `
-      <account-card label="${item.label}"></account-card>
+      <account-card label="${item.label}" period="${
+        (item as TOTP).period
+      }"></account-card>
     `
     })
     .join('')
