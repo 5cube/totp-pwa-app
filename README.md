@@ -1,4 +1,4 @@
-# TOTP Authenticator app
+# TOTP/HOTP Authenticator app
 
 Минимальное приложение двухфакторной аутентификации(2FA) на Vite+PWA+IndexedDB.
 

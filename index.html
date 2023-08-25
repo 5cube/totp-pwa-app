@@ -4,18 +4,18 @@
     <meta charset="UTF-8" />
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>TOTP-аутентификация</title>
+    <title>TOTP/HOTP аутентификация</title>
     <meta
       name="description"
       content="Минимальное приложение двухфакторной аутентификации(2FA)."
     />
-    <link rel="stylesheet" href="/src/index.css" />
+    <link rel="stylesheet" href="/src/assets/css/index.css" />
   </head>
   <body class="container flex flex-col font-sans antialiased">
     <header class="sticky top-0 flex h-16 items-center">
       <div class="grow">
         <a href="/">
-          <h1 class="inline text-lg font-semibold">TOTP-аутентификация</h1>
+          <h1 class="inline text-lg font-semibold">T(H)OTP</h1>
         </a>
       </div>
       <div class="shrink-0">
@@ -62,7 +62,6 @@
               aria-label="label input"
               autocomplete="off"
               required
-              minlength="3"
               autofocus
             />
             <input
@@ -105,7 +104,6 @@
 
     <footer class="container py-2 text-sm text-gray-500">&copy;2023</footer>
 
-    <script type="module" src="/src/db.ts"></script>
     <script type="module" src="/src/header.ts"></script>
     <script type="module" src="/src/main.ts"></script>
   </body>

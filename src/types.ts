@@ -18,4 +18,5 @@ export interface TOTP {
   period?: number
 }
 
-export type Account = (HOTP | TOTP) & { created?: number }
+export type Account = (HOTP | TOTP) & { id: number; created?: number }
+export type AccountCreateRequest = Omit<Account, 'id'>

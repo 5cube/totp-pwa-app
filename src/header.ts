@@ -1,6 +1,5 @@
-import { addAccount } from './db'
-import { renderList } from './account'
-import type { Account } from './types'
+import { addAccount } from './data/db'
+import type { Account, AccountCreateRequest, TOTP } from './types'
 
 const addButton = document.getElementById('add-button') as HTMLButtonElement
 const addDialog = document.getElementById('add-dialog') as HTMLDialogElement
@@ -16,14 +15,14 @@ addButton.addEventListener('click', () => {
 addDialog.addEventListener('close', async () => {
   if (addDialog.returnValue === 'submit') {
     const formData = new FormData(addForm)
-    const data: Account = {
+    const data: AccountCreateRequest = {
       label: encodeURIComponent(formData.get('add-form-label') as string),
       secret: formData.get('add-form-secret') as string,
       type: 'totp',
     }
     addForm.reset()
-    await addAccount(data)
-    await renderList()
+    const result = await addAccount(data)
+    appendAccountCard(result)
   }
   closeAddDialog()
 })
@@ -42,4 +41,18 @@ function openAddDialog() {
 function closeAddDialog() {
   addButton.removeAttribute('aria-expanded')
   addButton.removeAttribute('aria-controls')
+}
+
+function appendAccountCard(data: Account) {
+  const accountsListSection = document.getElementById(
+    'accounts-list',
+  ) as HTMLElement
+  const element = document.createElement('account-card')
+  const period = (data as TOTP).period
+  element.setAttribute('id', String(data.id))
+  element.setAttribute('label', data.label)
+  if (period) {
+    element.setAttribute('period', String(period))
+  }
+  accountsListSection.prepend(element)
 }

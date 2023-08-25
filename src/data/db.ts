@@ -1,8 +1,9 @@
-import type { Account } from './types'
+import type { Account, AccountCreateRequest } from '../types'
 
 const DB_NAME = 'store'
 const ACCOUNTS_STORE_NAME = 'accounts'
-const ACCOUNTS_STORE_KEY = 'label'
+const ACCOUNTS_STORE_CREATED_KEY = 'created'
+const ACCOUNTS_STORE_CREATED_INDEX = `${ACCOUNTS_STORE_CREATED_KEY}_idx`
 
 const dbPromise = new Promise<IDBDatabase>((resolve, reject) => {
   let _db: IDBDatabase | undefined
@@ -12,9 +13,14 @@ const dbPromise = new Promise<IDBDatabase>((resolve, reject) => {
   openRequest.onupgradeneeded = function () {
     _db = openRequest.result
     if (!_db.objectStoreNames.contains(ACCOUNTS_STORE_NAME)) {
-      _db.createObjectStore(ACCOUNTS_STORE_NAME, {
-        keyPath: ACCOUNTS_STORE_KEY,
+      const store = _db.createObjectStore(ACCOUNTS_STORE_NAME, {
+        keyPath: 'id',
+        autoIncrement: true,
       })
+      store.createIndex(
+        ACCOUNTS_STORE_CREATED_INDEX,
+        ACCOUNTS_STORE_CREATED_KEY,
+      )
     }
   }
 
@@ -62,16 +68,37 @@ function resolveRequest<T>(request: IDBRequest<T>) {
   })
 }
 
-export async function addAccount(item: Account) {
+function resolveCursorRequest<T>(
+  request: IDBRequest<IDBCursorWithValue | null>,
+) {
+  const resultArray: T[] = []
+
+  return new Promise<T[]>((resolve) => {
+    request.onsuccess = () => {
+      const cursor = request.result
+      if (cursor) {
+        resultArray.push(cursor.value)
+        cursor.continue()
+      } else {
+        resolve(resultArray)
+      }
+    }
+  })
+}
+
+export async function addAccount(item: AccountCreateRequest) {
   const db = await useDb()
   const transaction = db.transaction(ACCOUNTS_STORE_NAME, 'readwrite')
   const accounts = transaction.objectStore(ACCOUNTS_STORE_NAME)
   const request = accounts.add({
     ...item,
-    createdAt: new Date().getTime(),
+    [ACCOUNTS_STORE_CREATED_KEY]: Date.now(),
   })
-  const result = await resolveRequest<IDBValidKey>(request)
-  return result
+  const id = await resolveRequest<IDBValidKey>(request)
+  return {
+    ...item,
+    id,
+  } as Account
 }
 
 export async function updateAccount(item: Account) {
@@ -81,15 +108,18 @@ export async function updateAccount(item: Account) {
   const request = accounts.put({
     ...item,
   })
-  const result = await resolveRequest<IDBValidKey>(request)
-  return result
+  const id = await resolveRequest<IDBValidKey>(request)
+  return {
+    ...item,
+    id,
+  } as Account
 }
 
-export async function deleteAccount(key: IDBValidKey) {
+export async function deleteAccount(id: number | string) {
   const db = await useDb()
   const transaction = db.transaction(ACCOUNTS_STORE_NAME, 'readwrite')
   const accounts = transaction.objectStore(ACCOUNTS_STORE_NAME)
-  const request = accounts.delete(key)
+  const request = accounts.delete(Number(id))
   const result = await resolveRequest<undefined>(request)
   return result
 }
@@ -98,7 +128,8 @@ export async function getAccounts() {
   const db = await useDb()
   const transaction = db.transaction(ACCOUNTS_STORE_NAME, 'readonly')
   const accounts = transaction.objectStore(ACCOUNTS_STORE_NAME)
-  const request = accounts.getAll()
-  const result = await resolveRequest<Account[]>(request)
+  const createdIndex = accounts.index(ACCOUNTS_STORE_CREATED_INDEX)
+  const request = createdIndex.openCursor(undefined, 'prev')
+  const result = await resolveCursorRequest<Account>(request)
   return result
 }
