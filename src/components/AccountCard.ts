@@ -91,7 +91,7 @@ export class AccountCard extends HTMLElement {
   }
 
   private setLabel(label: string) {
-    const element = this.shadowRoot?.querySelector('h3')
+    const element = this.shadowRoot?.querySelector('label')
     if (element) {
       element.innerHTML = label
     }

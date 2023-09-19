@@ -17,7 +17,8 @@
     </app-header>
 
     <main class="container">
-      <section id="accounts-list"></section>
+      <h2>Список аккаунтов</h2>
+      <section id="accounts-list" aria-busy="true"></section>
     </main>
 
     <footer class="container">&copy;2023</footer>
@@ -27,41 +28,49 @@
     <template id="account-card-template">
       <style>
         :host {
+          display: -webkit-box;
+          display: -ms-flexbox;
           display: flex;
+          -webkit-box-align: center;
+          -ms-flex-align: center;
           align-items: center;
           border-radius: 0.5rem;
           padding: 1rem;
-          padding-top: 0.5rem;
+          padding-top: 0.75rem;
+          padding-right: 0.5rem;
+          -webkit-box-shadow:
+            0 1px 3px 0 rgb(0 0 0 / 0.1),
+            0 1px 2px -1px rgb(0 0 0 / 0.1);
           box-shadow:
             0 1px 3px 0 rgb(0 0 0 / 0.1),
             0 1px 2px -1px rgb(0 0 0 / 0.1);
         }
-        :host > :not([hidden]) ~ :not([hidden]) {
-          margin-left: 0.5rem;
-        }
         :host > div:first-of-type {
+          -webkit-box-flex: 1;
+          -ms-flex-positive: 1;
           flex-grow: 1;
+          display: -webkit-box;
+          display: -ms-flexbox;
           display: flex;
+          -webkit-box-orient: vertical;
+          -webkit-box-direction: normal;
+          -ms-flex-direction: column;
           flex-direction: column;
         }
-        h3 {
-          margin-bottom: 0.25rem;
-          margin: 0;
-          font-weight: 500;
+        label {
+          font-size: 0.875rem;
+          line-height: 1.25rem;
         }
         .code {
-          display: inline-flex;
-          align-items: center;
-          justify-content: center;
-          width: 5.5rem;
-          border-radius: 0.5rem;
-          background-color: rgb(var(--colors-gray-light) / 0.25);
-          padding: 0.25rem 0.375rem;
-          font-weight: 600;
+          font-size: 1.25rem;
+          line-height: 1.75rem;
+          font-weight: 500;
           letter-spacing: 0.1em;
           cursor: pointer;
         }
         button {
+          margin-left: 0.5rem;
+          -ms-flex-negative: 0;
           flex-shrink: 0;
           background-color: transparent;
           padding: 0.5rem;
@@ -77,23 +86,23 @@
           height: 1.5rem;
           width: 1.5rem;
         }
-
         @media (prefers-color-scheme: dark) {
           :host {
+            -webkit-box-shadow: none;
             box-shadow: none;
             background-color: rgb(var(--colors-gray-dark) / 0.25);
           }
         }
       </style>
       <div>
-        <h3>
-          <slot name="label"></slot>
-        </h3>
         <div>
-          <div class="code">
+          <span class="code">
             <slot name="code"></slot>
-          </div>
+          </span>
         </div>
+        <label>
+          <slot name="label"></slot>
+        </label>
       </div>
       <div>
         <countdown-timer></countdown-timer>
@@ -120,11 +129,19 @@
         :host {
           position: sticky;
           top: 0;
+          display: -webkit-box;
+          display: -ms-flexbox;
           display: flex;
+          -webkit-box-align: center;
+          -ms-flex-align: center;
           align-items: center;
-          height: 4rem;
-          background-color: rgb(var(--colors-bg));
+          height: 3rem;
+          background-color: rgb(var(--colors-bg) / 0.75);
+          -webkit-backdrop-filter: blur(8px);
+          backdrop-filter: blur(8px);
           z-index: 1;
+          -ms-flex-negative: 0;
+          flex-shrink: 0;
         }
         h1 {
           display: inline;
@@ -137,9 +154,12 @@
           color: inherit;
         }
         :host > div:first-of-type {
+          -webkit-box-flex: 1;
+          -ms-flex-positive: 1;
           flex-grow: 1;
         }
         :host > div:last-of-type {
+          -ms-flex-negative: 0;
           flex-shrink: 0;
         }
       </style>
@@ -173,20 +193,37 @@
           width: 1.5rem;
         }
         #add-dialog {
-          max-width: 28rem;
+          min-width: 16rem;
           border-radius: 0.75rem;
           background-color: rgb(var(--colors-bg));
+          -webkit-box-shadow:
+            0 10px 15px -3px rgb(0 0 0 / 0.1),
+            0 4px 6px -4px rgb(0 0 0 / 0.1);
           box-shadow:
             0 10px 15px -3px rgb(0 0 0 / 0.1),
             0 4px 6px -4px rgb(0 0 0 / 0.1);
           padding: 1.5rem;
           border-color: transparent;
         }
-        #add-dialog::backdrop {
+        #add-dialog::-webkit-backdrop {
           background-color: rgb(255 255 255 / 0.75);
+          -webkit-backdrop-filter: blur(8px);
           backdrop-filter: blur(8px);
         }
+        #add-dialog::backdrop {
+          background-color: rgb(255 255 255 / 0.75);
+          -webkit-backdrop-filter: blur(8px);
+          backdrop-filter: blur(8px);
+        }
+        @media (min-width: 640px) {
+          #add-dialog {
+            min-width: 20rem;
+          }
+        }
         @media (prefers-color-scheme: dark) {
+          #add-dialog::-webkit-backdrop {
+            background-color: rgb(0 0 0 / 0.75);
+          }
           #add-dialog::backdrop {
             background-color: rgb(0 0 0 / 0.75);
           }
@@ -199,7 +236,12 @@
           color: rgb(var(--colors-text));
         }
         form#add-form {
+          display: -webkit-box;
+          display: -ms-flexbox;
           display: flex;
+          -webkit-box-orient: vertical;
+          -webkit-box-direction: normal;
+          -ms-flex-direction: column;
           flex-direction: column;
         }
         form#add-form > :not([hidden]) ~ :not([hidden]) {

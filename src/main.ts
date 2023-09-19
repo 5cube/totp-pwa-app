@@ -15,7 +15,9 @@ export const timerWorker = new TimerWorker()
 
 async function renderList() {
   const items = await getAccounts()
-  ;(document.getElementById('accounts-list') as HTMLElement).innerHTML = items
+  const element = document.getElementById('accounts-list') as HTMLElement
+  element.removeAttribute('aria-busy')
+  element.innerHTML = items
     .map((item) => {
       return `
         <account-card id="${item.id}" label="${item.label}" period="${

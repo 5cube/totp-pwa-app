@@ -49,14 +49,26 @@ a {
   text-decoration: inherit;
 }
 
+h2 {
+  font-size: 0.875rem;
+  line-height: 1.25rem;
+  font-weight: 500;
+  margin-top: 0;
+  margin-bottom: 0.75rem;
+}
+
 main {
   flex-grow: 1;
-  padding-top: 2rem;
+  padding-top: 1.5rem;
   padding-bottom: 2rem;
 }
 section#accounts-list {
   display: grid;
   gap: 1.5rem;
+}
+section#accounts-list:not([aria-busy='true']):empty::after {
+  color: rgb(var(--colors-gray));
+  content: 'Нет данных';
 }
 
 footer {
@@ -64,7 +76,7 @@ footer {
   padding-bottom: 0.5rem;
   font-size: 0.875rem;
   line-height: 1.25rem;
-  color: rgb(107 114 128);
+  color: rgb(var(--colors-gray));
 }
 
 .container {
