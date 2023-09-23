@@ -1,10 +1,7 @@
-import { addAccount } from '../data/db'
-import type { Account, AccountCreateRequest, TOTP } from '../types'
+import { AccountList } from './AccountList'
+import type { AccountCreateRequest } from '../types'
 
 export class AccountAddDialog extends HTMLElement {
-  private addButton: HTMLButtonElement | undefined
-  private addDialog: HTMLDialogElement | undefined
-
   constructor() {
     super()
 
@@ -13,24 +10,48 @@ export class AccountAddDialog extends HTMLElement {
       'account-add-dialog-template',
     ) as HTMLTemplateElement
     shadowRoot.appendChild(template.content.cloneNode(true))
+  }
 
-    this.addButton = shadowRoot.getElementById(
+  private openAddDialog() {
+    const addButton = this.shadowRoot?.getElementById(
       'add-button',
     ) as HTMLButtonElement
-    this.addDialog = shadowRoot.getElementById(
+    const addDialog = this.shadowRoot?.getElementById(
       'add-dialog',
     ) as HTMLDialogElement
-    const addForm = shadowRoot.getElementById('add-form') as HTMLFormElement
-    const addFormCancelButton = shadowRoot.getElementById(
+    addButton.setAttribute('aria-expanded', 'true')
+    addButton.setAttribute('aria-controls', 'add-dialog')
+    addDialog.showModal()
+  }
+
+  private closeAddDialog() {
+    const addButton = this.shadowRoot?.getElementById(
+      'add-button',
+    ) as HTMLButtonElement
+    addButton.removeAttribute('aria-expanded')
+    addButton.removeAttribute('aria-controls')
+  }
+
+  connectedCallback() {
+    const addButton = this.shadowRoot?.getElementById(
+      'add-button',
+    ) as HTMLButtonElement
+    const addDialog = this.shadowRoot?.getElementById(
+      'add-dialog',
+    ) as HTMLDialogElement
+    const addForm = this.shadowRoot?.getElementById(
+      'add-form',
+    ) as HTMLFormElement
+    const addFormCancelButton = this.shadowRoot?.getElementById(
       'add-form-cancel',
     ) as HTMLButtonElement
 
-    this.addButton.addEventListener('click', () => {
+    addButton.addEventListener('click', () => {
       this.openAddDialog()
     })
 
-    this.addDialog.addEventListener('close', async () => {
-      if (this.addDialog?.returnValue === 'submit') {
+    addDialog.addEventListener('close', async () => {
+      if (addDialog.returnValue === 'submit') {
         const formData = new FormData(addForm)
         const data: AccountCreateRequest = {
           label: encodeURIComponent(formData.get('add-form-label') as string),
@@ -38,40 +59,20 @@ export class AccountAddDialog extends HTMLElement {
           type: 'totp',
         }
         addForm.reset()
-        const result = await addAccount(data)
-        this.appendAccountCard(result)
+        await AccountList.addItem(data)
       }
       this.closeAddDialog()
     })
 
-    addFormCancelButton.addEventListener('click', (event) => {
-      event.preventDefault()
-      this.addDialog?.close(addFormCancelButton.value)
+    addFormCancelButton.addEventListener('click', (e) => {
+      e.preventDefault()
+      addDialog.close(addFormCancelButton.value)
     })
   }
+}
 
-  private openAddDialog() {
-    this.addButton?.setAttribute('aria-expanded', 'true')
-    this.addButton?.setAttribute('aria-controls', 'add-dialog')
-    this.addDialog?.showModal()
-  }
-
-  private closeAddDialog() {
-    this.addButton?.removeAttribute('aria-expanded')
-    this.addButton?.removeAttribute('aria-controls')
-  }
-
-  private appendAccountCard(data: Account) {
-    const accountsListSection = document.getElementById(
-      'accounts-list',
-    ) as HTMLElement
-    const element = document.createElement('account-card')
-    const period = (data as TOTP).period
-    element.setAttribute('id', String(data.id))
-    element.setAttribute('label', data.label)
-    if (period) {
-      element.setAttribute('period', String(period))
-    }
-    accountsListSection.prepend(element)
+declare global {
+  interface HTMLElementTagNameMap {
+    'account-add-dialog': AccountAddDialog
   }
 }

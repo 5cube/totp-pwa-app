@@ -1,7 +1,7 @@
 const template = document.createElement('template')
 template.innerHTML = '<input type="checkbox">'
 
-export class AppThemeSwitcher extends HTMLElement {
+export class AppTheme extends HTMLElement {
   constructor() {
     super()
 
@@ -25,6 +25,7 @@ export class AppThemeSwitcher extends HTMLElement {
       this.setTheme(input.checked ? 'dark' : 'light')
     })
   }
+
   private setTheme(theme: 'light' | 'dark' = 'light') {
     const root = document.querySelector(':root') as HTMLElement
     if (theme === 'dark') {
@@ -32,5 +33,11 @@ export class AppThemeSwitcher extends HTMLElement {
     } else {
       root.classList.remove('dark')
     }
+  }
+}
+
+declare global {
+  interface HTMLElementTagNameMap {
+    'app-theme': AppTheme
   }
 }

@@ -1,29 +1,36 @@
 import { DEFAULT_PERIOD } from '../data/const'
 
 export class CountdownTimer extends HTMLElement {
-  private rendered = false
+  constructor() {
+    super()
+
+    const shadowRoot = this.attachShadow({ mode: 'open' })
+    const template = document.getElementById(
+      'countdown-timer-template',
+    ) as HTMLTemplateElement
+    shadowRoot.appendChild(template.content.cloneNode(true))
+  }
 
   private getColors(value: number) {
     return `hsl(${value * 120},100%,40%)`
   }
 
-  private render() {
+  private setColor() {
     const seconds = this.getAttribute('seconds')
     const value = seconds ? Number.parseInt(seconds) : null
     const period =
       Number.parseInt(this.getAttribute('period') as string) || DEFAULT_PERIOD
+    const rootElement =
+      this.shadowRoot?.querySelector<HTMLElement>('div:first-of-type')
+    const valueElement = rootElement?.querySelector(
+      '[part="value"]',
+    ) as HTMLElement
     if (value) {
-      const color = this.getColors(value / period)
-      this.innerHTML = `
-        <div style="color: ${color}; position: relative; -webkit-transition: color 150ms cubic-bezier(0.4, 0, 0.2, 1); -o-transition: color 150ms cubic-bezier(0.4, 0, 0.2, 1); transition: color 150ms cubic-bezier(0.4, 0, 0.2, 1); width: 48px; height: 48px;">
-          <svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 48 48" style="-webkit-transform: rotate(-90deg); -ms-transform: rotate(-90deg); transform: rotate(-90deg);">
-            <circle r="20" cx="24" cy="24" fill="none" stroke="${color}" stroke-width="2px"></circle>
-          </svg>
-          <div style="color: currentColor; font-weight: 700; position: absolute; left: 50%; top: 50%; -webkit-transform: translate(-50%, -50%); -ms-transform: translate(-50%, -50%); transform: translate(-50%, -50%);">${value}</div>
-        </div>
-      `
+      rootElement?.style.setProperty('color', this.getColors(value / period))
+      valueElement.innerText = String(value)
     } else {
-      this.innerHTML = ''
+      rootElement?.style.removeProperty('color')
+      valueElement.innerText = ''
     }
   }
 
@@ -32,13 +39,22 @@ export class CountdownTimer extends HTMLElement {
   }
 
   connectedCallback() {
-    if (!this.rendered) {
-      this.render()
-      this.rendered = true
-    }
+    this.setColor()
   }
 
-  attributeChangedCallback() {
-    this.render()
+  attributeChangedCallback(
+    _name: string,
+    oldValue: string | number | null,
+    newValue: string | number | null,
+  ) {
+    if (oldValue !== newValue) {
+      this.setColor()
+    }
+  }
+}
+
+declare global {
+  interface HTMLElementTagNameMap {
+    'countdown-timer': CountdownTimer
   }
 }

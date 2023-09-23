@@ -54,7 +54,7 @@ h2 {
   line-height: 1.25rem;
   font-weight: 500;
   margin-top: 0;
-  margin-bottom: 0.75rem;
+  margin-bottom: 1rem;
 }
 
 main {
@@ -62,13 +62,45 @@ main {
   padding-top: 1.5rem;
   padding-bottom: 2rem;
 }
-section#accounts-list {
-  display: grid;
-  gap: 1.5rem;
+
+header {
+  position: sticky;
+  top: 0;
+  display: flex;
+  align-items: center;
+  height: 3rem;
+  background-color: rgb(var(--colors-bg) / 0.75);
+  backdrop-filter: blur(8px);
+  z-index: 1;
+  flex-shrink: 0;
 }
-section#accounts-list:not([aria-busy='true']):empty::after {
-  color: rgb(var(--colors-gray));
-  content: 'Нет данных';
+header h1 {
+  display: inline;
+  font-size: 1.125rem;
+  line-height: 1.75rem;
+  font-weight: 600;
+}
+header a.logo {
+  color: inherit;
+}
+
+.back-button {
+  background-color: transparent;
+  padding: 0;
+  border: 0;
+  display: inline-flex;
+  align-items: center;
+  font-size: 1rem;
+  font-weight: 500;
+  cursor: pointer;
+}
+.back-button:hover {
+  color: rgb(var(--colors-primary-highlight));
+}
+.back-button svg {
+  display: block;
+  height: 1.25rem;
+  width: 1.25rem;
 }
 
 footer {
@@ -87,4 +119,14 @@ footer {
   width: 100%;
   max-width: 42rem;
   box-sizing: border-box;
+}
+
+.hidden {
+  display: none;
+}
+.grow {
+  flex-grow: 1;
+}
+.shrink-0 {
+  flex-shrink: 0;
 }

@@ -124,6 +124,15 @@ export async function deleteAccount(id: number | string) {
   return result
 }
 
+export async function getAccount(id: number | string) {
+  const db = await useDb()
+  const transaction = db.transaction(ACCOUNTS_STORE_NAME, 'readonly')
+  const account = transaction.objectStore(ACCOUNTS_STORE_NAME)
+  const request = account.get(Number(id))
+  const result = await resolveRequest<Account | undefined>(request)
+  return result
+}
+
 export async function getAccounts() {
   const db = await useDb()
   const transaction = db.transaction(ACCOUNTS_STORE_NAME, 'readonly')
