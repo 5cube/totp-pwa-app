@@ -1,20 +1,20 @@
-import { DEFAULT_PERIOD } from '../data/const'
+import { DEFAULT_PERIOD, DEFAULT_DIGITS } from '../data/const'
 import { timerWorker } from '../main'
+import { getAccount } from '../data/db'
 import { secondsFromMs, periodSeconds } from '../utils/seconds'
+import init, { get_token } from '../../wasm/pkg/totp_wasm'
 
-function getRandom() {
-  return (Math.random() + 1).toString(36).slice(2, 8)
-}
+let gen: (secret: string, step: bigint, digits: number) => string | undefined
+init().then(() => {
+  gen = get_token
+})
 
 export class AccountCode extends HTMLElement {
-  private code = ''
   private seconds: number | null = null
   private period = DEFAULT_PERIOD
 
   constructor() {
     super()
-
-    this.code = getRandom()
 
     const shadowRoot = this.attachShadow({ mode: 'open' })
     const template = document.getElementById(
@@ -44,11 +44,20 @@ export class AccountCode extends HTMLElement {
       ?.setAttribute('period', String(this.period))
   }
 
-  private setCode(code: string) {
-    const element =
-      this.shadowRoot?.querySelector<HTMLElement>('[part="code"]>span')
-    if (element) {
-      element.innerText = code
+  private async setCode() {
+    const accountId = this.getAttribute('account-id') as string
+    const item = await getAccount(accountId)
+    if (item) {
+      const code = gen(
+        item.secret,
+        BigInt(this.period),
+        item.digits ?? DEFAULT_DIGITS,
+      )
+      const element =
+        this.shadowRoot?.querySelector<HTMLElement>('[part="code"]>span')
+      if (element) {
+        element.innerText = code || '-'
+      }
     }
   }
 
@@ -70,10 +79,10 @@ export class AccountCode extends HTMLElement {
         }
       })
 
-    this.setCode(this.code)
     this.setPeriod(this.getAttribute('period'))
     const seconds = periodSeconds(secondsFromMs(Date.now()), this.period)
     this.setSeconds(seconds)
+    this.setCode()
 
     timerWorker.addEventListener('message', (e) => {
       switch (e.data.type) {
@@ -81,8 +90,7 @@ export class AccountCode extends HTMLElement {
           const seconds = e.data[this.period]
           this.setSeconds(seconds)
           if (seconds === this.period) {
-            this.code = getRandom()
-            this.setCode(this.code)
+            this.setCode()
           }
           break
       }
