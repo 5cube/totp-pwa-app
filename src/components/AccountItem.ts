@@ -13,25 +13,20 @@ export class AccountItem extends HTMLElement {
   }
 
   static get observedAttributes() {
-    return ['period']
+    return ['account-id', 'period']
   }
 
   connectedCallback() {
-    const accountId = this.getAttribute('account-id') as string
-
     this.shadowRoot
       ?.querySelector('button')
       ?.addEventListener('click', async () => {
+        const accountId = this.getAttribute('account-id') as string
         const result = confirm('Вы уверены что хотите удалить?')
         if (result) {
           await AccountList.deleteItem(accountId)
           history.length > 2 ? history.back() : location.replace('/')
         }
       })
-
-    this.shadowRoot
-      ?.querySelector<HTMLElement>('account-code')
-      ?.setAttribute('account-id', accountId)
   }
 
   attributeChangedCallback(
@@ -40,6 +35,13 @@ export class AccountItem extends HTMLElement {
     newValue: string | number | null,
   ) {
     switch (name) {
+      case 'account-id':
+        if (newValue) {
+          this.shadowRoot
+            ?.querySelector<HTMLElement>('account-code')
+            ?.setAttribute('account-id', newValue as string)
+        }
+        break
       case 'period':
         this.shadowRoot
           ?.querySelector<HTMLElement>('account-code')

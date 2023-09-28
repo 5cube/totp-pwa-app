@@ -1,6 +1,6 @@
 import { DEFAULT_PERIOD } from '../data/const'
 import { AccountList } from './AccountList'
-import type { Account, TOTP } from '../types'
+import type { Account } from '../types'
 
 export class AccountCard extends HTMLElement {
   constructor() {
@@ -28,7 +28,7 @@ export class AccountCard extends HTMLElement {
     const accountId = this.getAttribute('account-id') as string
 
     this.shadowRoot
-      ?.querySelector<HTMLElement>('account-code')
+      ?.querySelector('account-code')
       ?.setAttribute('account-id', accountId)
 
     this.shadowRoot
@@ -59,7 +59,7 @@ export class AccountCard extends HTMLElement {
         break
       case 'period':
         this.shadowRoot
-          ?.querySelector<HTMLElement>('account-code')
+          ?.querySelector('account-code')
           ?.setAttribute('period', String(newValue || DEFAULT_PERIOD))
         break
     }
@@ -67,7 +67,7 @@ export class AccountCard extends HTMLElement {
 
   static createElement(item: Account) {
     const element = document.createElement('account-card')
-    const period = (item as TOTP).period
+    const period = item.period
     element.setAttribute('account-id', String(item.id))
     element.setAttribute('label', item.label)
     if (period) {

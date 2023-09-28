@@ -1,13 +1,3 @@
-export interface HOTP {
-  type: 'hotp'
-  label: string
-  secret: string
-  issuer?: string
-  algorithm?: string
-  digits?: number
-  counter?: number
-}
-
 export interface TOTP {
   type: 'totp'
   label: string
@@ -18,5 +8,5 @@ export interface TOTP {
   period?: number
 }
 
-export type Account = (HOTP | TOTP) & { id: number; created?: number }
+export type Account = TOTP & { id: number; created?: number }
 export type AccountCreateRequest = Omit<Account, 'id'>

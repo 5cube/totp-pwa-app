@@ -6,7 +6,6 @@ export class AppTheme extends HTMLElement {
     super()
 
     const shadowRoot = this.attachShadow({ mode: 'open' })
-
     shadowRoot.appendChild(template.content.cloneNode(true))
 
     const inputElement = shadowRoot.querySelector('input') as HTMLInputElement

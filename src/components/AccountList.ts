@@ -5,23 +5,13 @@ import type { AccountCreateRequest } from '../types'
 export class AccountList extends HTMLElement {
   constructor() {
     super()
-
-    const shadowRoot = this.attachShadow({ mode: 'open' })
-    const template = document.getElementById(
-      'account-list-template',
-    ) as HTMLTemplateElement
-    shadowRoot.appendChild(template.content.cloneNode(true))
-
-    // устанавливется атрибут загрузки
-    const sectionElement = shadowRoot.querySelector('section')
-    sectionElement?.setAttribute('loading', '')
   }
 
   async connectedCallback() {
     const items = await getAccounts()
-    const sectionElement = this.shadowRoot?.querySelector('section')
+    const sectionElement = document.querySelector('account-list section')
     if (sectionElement) {
-      // после получения данных атрибут загрузки удаляется
+      // удаляется атрибут индикации загрузки, который установлен в шаблоне html
       sectionElement.removeAttribute('loading')
       for (const item of items) {
         const itemElement = AccountCard.createElement(item)
@@ -33,10 +23,7 @@ export class AccountList extends HTMLElement {
   static async addItem(data: AccountCreateRequest) {
     const item = await addAccount(data)
     const itemElement = AccountCard.createElement(item)
-    document
-      .querySelector('account-list')
-      ?.shadowRoot?.querySelector('section')
-      ?.prepend(itemElement)
+    document.querySelector('account-list section')?.prepend(itemElement)
 
     // заменить hash, если имеется
     if (location.hash) {
@@ -46,10 +33,7 @@ export class AccountList extends HTMLElement {
 
   static async deleteItem(id: string) {
     await deleteAccount(id)
-    document
-      .querySelector('account-list')
-      ?.shadowRoot?.querySelector(`[account-id="${id}"]`)
-      ?.remove()
+    document.querySelector(`account-list [account-id="${id}"]`)?.remove()
   }
 }
 

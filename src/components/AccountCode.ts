@@ -4,11 +4,6 @@ import { getAccount } from '../data/db'
 import { secondsFromMs, periodSeconds } from '../utils/seconds'
 import init, { get_token } from '../../wasm/pkg/totp_wasm'
 
-let gen: (secret: string, step: bigint, digits: number) => string | undefined
-init().then(() => {
-  gen = get_token
-})
-
 export class AccountCode extends HTMLElement {
   private seconds: number | null = null
   private period = DEFAULT_PERIOD
@@ -29,7 +24,7 @@ export class AccountCode extends HTMLElement {
     }
     this.seconds = val
     this.shadowRoot
-      ?.querySelector<HTMLElement>('countdown-timer')
+      ?.querySelector('countdown-timer')
       ?.setAttribute('seconds', String(this.seconds))
   }
 
@@ -40,7 +35,7 @@ export class AccountCode extends HTMLElement {
     this.period = Number.parseInt(val as string) || DEFAULT_PERIOD
     timerWorker.postMessage({ type: 'period', period: this.period })
     this.shadowRoot
-      ?.querySelector<HTMLElement>('countdown-timer')
+      ?.querySelector('countdown-timer')
       ?.setAttribute('period', String(this.period))
   }
 
@@ -48,7 +43,7 @@ export class AccountCode extends HTMLElement {
     const accountId = this.getAttribute('account-id') as string
     const item = await getAccount(accountId)
     if (item) {
-      const code = gen(
+      const code = get_token(
         item.secret,
         BigInt(this.period),
         item.digits ?? DEFAULT_DIGITS,
@@ -65,7 +60,9 @@ export class AccountCode extends HTMLElement {
     return ['period']
   }
 
-  connectedCallback() {
+  async connectedCallback() {
+    await init()
+
     const codeElement = this.shadowRoot?.querySelector<HTMLElement>('span')
 
     this.shadowRoot

@@ -35,20 +35,20 @@
       media="(orientation: portrait)"
     />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>TOTP/HOTP аутентификация</title>
+    <title>TOTP PWA-приложение</title>
     <meta
       name="description"
-      content="Минимальное приложение двухфакторной аутентификации(2FA)."
+      content="Минималистичное PWA-приложение генерации TOTP кодов для двухфакторной аутентификации(2FA)."
     />
     <link rel="stylesheet" href="/src/assets/css/index.css" />
   </head>
   <body>
     <header class="container">
       <a href="/" class="logo">
-        <h1>T(H)OTP</h1>
+        <h1>TOTP</h1>
       </a>
       <button
-        class="back-button hidden"
+        class="button button-flat button-back hidden"
         onclick="history.length > 2 ? history.back() : location.replace('/')"
       >
         <svg
@@ -74,7 +74,8 @@
 
     <main class="container">
       <account-list>
-        <h2 slot="title">Список аккаунтов</h2>
+        <h2>Список аккаунтов</h2>
+        <section loading></section>
       </account-list>
     </main>
 
@@ -82,116 +83,16 @@
 
     <script type="module" src="/src/main.ts"></script>
 
-    <template id="account-list-template">
-      <style>
-        section {
-          display: -ms-grid;
-          display: grid;
-          gap: 1.5rem;
-        }
-        section:not([loading]):empty::after {
-          color: rgb(var(--colors-gray));
-          content: 'Нет данных';
-        }
-      </style>
-      <slot name="title"></slot>
-      <section></section>
-    </template>
-
     <template id="account-item-template">
-      <style>
-        section {
-          display: -ms-grid;
-          display: grid;
-          gap: 1.5rem;
-        }
-        section:not([loading]):empty::after {
-          color: rgb(var(--colors-gray));
-          content: 'Нет данных';
-        }
-        button {
-          font-size: 1rem;
-        }
-      </style>
       <slot name="title"></slot>
-      <section>
+      <section part="section">
         <div>
           <account-code></account-code>
         </div>
         <div>
-          <button>Удалить</button>
+          <button part="button button-delete">Удалить</button>
         </div>
       </section>
-    </template>
-
-    <template id="account-code-template">
-      <style>
-        :host {
-          position: relative;
-          display: -webkit-box;
-          display: -ms-flexbox;
-          display: flex;
-          -webkit-box-align: center;
-          -ms-flex-align: center;
-          align-items: center;
-        }
-        [part='code'] {
-          font-size: 1.875rem;
-          font-weight: 500;
-          letter-spacing: 0.1em;
-          display: -webkit-box;
-          display: -ms-flexbox;
-          display: flex;
-          -webkit-box-align: center;
-          -ms-flex-align: center;
-          align-items: center;
-          cursor: pointer;
-          padding: 0.75rem 1.25rem;
-          border-radius: 0.5rem;
-          background-color: rgb(var(--colors-gray-light) / 0.25);
-        }
-        @media (prefers-color-scheme: dark) {
-          :host [part='code'] {
-            background-color: rgb(var(--colors-gray-dark) / 0.25);
-          }
-        }
-        :host([card]) [part='code'] {
-          font-size: 1.25rem;
-          padding: 0;
-          border-radius: 0;
-          background-color: transparent;
-        }
-        [part='code'] svg {
-          width: 0.8em;
-          height: 0.8em;
-          color: rgb(var(--colors-gray));
-        }
-        countdown-timer {
-          margin-left: 0.5rem;
-        }
-        :host([card]) countdown-timer {
-          position: absolute;
-          top: 0;
-          right: 0;
-        }
-      </style>
-      <div part="code" role="button">
-        <span></span>
-        <svg
-          xmlns="http://www.w3.org/2000/svg"
-          fill="none"
-          viewBox="0 0 24 24"
-          stroke-width="1.5"
-          stroke="currentColor"
-        >
-          <path
-            stroke-linecap="round"
-            stroke-linejoin="round"
-            d="M15.75 17.25v3.375c0 .621-.504 1.125-1.125 1.125h-9.75a1.125 1.125 0 01-1.125-1.125V7.875c0-.621.504-1.125 1.125-1.125H6.75a9.06 9.06 0 011.5.124m7.5 10.376h3.375c.621 0 1.125-.504 1.125-1.125V11.25c0-4.46-3.243-8.161-7.5-8.876a9.06 9.06 0 00-1.5-.124H9.375c-.621 0-1.125.504-1.125 1.125v3.5m7.5 10.375H9.375a1.125 1.125 0 01-1.125-1.125v-9.25m12 6.625v-1.875a3.375 3.375 0 00-3.375-3.375h-1.5a1.125 1.125 0 01-1.125-1.125v-1.5a3.375 3.375 0 00-3.375-3.375H9.75"
-          />
-        </svg>
-      </div>
-      <countdown-timer></countdown-timer>
     </template>
 
     <template id="account-card-template">
@@ -230,23 +131,6 @@
           font-size: 0.875rem;
           line-height: 1.25rem;
         }
-        button {
-          -ms-flex-negative: 0;
-          flex-shrink: 0;
-          background-color: transparent;
-          padding: 0.5rem;
-          border: 0;
-          cursor: pointer;
-          color: rgb(var(--colors-text));
-        }
-        button:hover {
-          color: rgb(220 38 38);
-        }
-        button svg {
-          display: block;
-          height: 1.5rem;
-          width: 1.5rem;
-        }
         @media (prefers-color-scheme: dark) {
           :host {
             -webkit-box-shadow: none;
@@ -263,8 +147,12 @@
           <slot name="label"></slot>
         </label>
       </div>
-      <button aria-label="Удалить">
+      <button
+        part="button button-flat button-icon button-delete"
+        aria-label="Удалить"
+      >
         <svg
+          part="icon"
           xmlns="http://www.w3.org/2000/svg"
           fill="none"
           viewBox="0 0 24 24"
@@ -280,22 +168,87 @@
       </button>
     </template>
 
-    <template id="account-add-dialog-template">
+    <template id="account-code-template">
       <style>
-        button#add-button {
+        :host {
+          position: relative;
+          display: -webkit-box;
+          display: -ms-flexbox;
+          display: flex;
+          -webkit-box-align: center;
+          -ms-flex-align: center;
+          align-items: center;
+        }
+        [part='code'] {
+          font-size: 1.875rem;
+          font-weight: 500;
+          letter-spacing: 0.1em;
+          display: -webkit-box;
+          display: -ms-flexbox;
+          display: flex;
+          -webkit-box-align: center;
+          -ms-flex-align: center;
+          align-items: center;
+          cursor: pointer;
+          padding: 0.75rem 1.25rem;
+          border-radius: 0.5rem;
+          background-color: rgb(var(--colors-gray-light) / 0.15);
+        }
+        [part='code']:hover {
+          background-color: rgb(var(--colors-gray-light) / 0.3);
+        }
+        @media (prefers-color-scheme: dark) {
+          [part='code'] {
+            background-color: rgb(var(--colors-gray-dark) / 0.15);
+          }
+          [part='code']:hover {
+            background-color: rgb(var(--colors-gray-dark) / 0.3);
+          }
+        }
+        :host([card]) [part='code'] {
+          font-size: 1.25rem;
+          padding: 0;
+          border-radius: 0;
           background-color: transparent;
-          padding: 0.5rem;
-          border: 0;
+        }
+        [part='code'] svg {
+          width: 0.8em;
+          height: 0.8em;
+          color: rgb(var(--colors-gray));
+        }
+        [part='code']:hover svg {
           color: rgb(var(--colors-text));
         }
-        button#add-button:hover {
-          color: rgb(var(--colors-primary-highlight));
+        countdown-timer {
+          margin-left: 0.5rem;
         }
-        button#add-button svg {
-          display: block;
-          height: 1.5rem;
-          width: 1.5rem;
+        :host([card]) countdown-timer {
+          position: absolute;
+          top: 0;
+          right: 0;
         }
+      </style>
+      <div part="code" role="button">
+        <span></span>
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          fill="none"
+          viewBox="0 0 24 24"
+          stroke-width="1.5"
+          stroke="currentColor"
+        >
+          <path
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            d="M15.75 17.25v3.375c0 .621-.504 1.125-1.125 1.125h-9.75a1.125 1.125 0 01-1.125-1.125V7.875c0-.621.504-1.125 1.125-1.125H6.75a9.06 9.06 0 011.5.124m7.5 10.376h3.375c.621 0 1.125-.504 1.125-1.125V11.25c0-4.46-3.243-8.161-7.5-8.876a9.06 9.06 0 00-1.5-.124H9.375c-.621 0-1.125.504-1.125 1.125v3.5m7.5 10.375H9.375a1.125 1.125 0 01-1.125-1.125v-9.25m12 6.625v-1.875a3.375 3.375 0 00-3.375-3.375h-1.5a1.125 1.125 0 01-1.125-1.125v-1.5a3.375 3.375 0 00-3.375-3.375H9.75"
+          />
+        </svg>
+      </div>
+      <countdown-timer></countdown-timer>
+    </template>
+
+    <template id="account-add-dialog-template">
+      <style>
         #add-dialog {
           min-width: 16rem;
           border-radius: 0.75rem;
@@ -355,19 +308,19 @@
           color: rgb(var(--colors-text));
         }
         button#add-form-submit {
-          margin-left: 0.5rem;
           color: rgb(var(--colors-primary));
-        }
-        button,
-        input {
-          font-size: 1rem;
-        }
-        button {
-          cursor: pointer;
+          font-weight: 500;
+          margin-left: 0.5rem;
         }
       </style>
-      <button id="add-button" aria-haspopup="true" aria-label="Добавить">
+      <button
+        part="button button-flat button-icon"
+        id="add-button"
+        aria-haspopup="true"
+        aria-label="Добавить"
+      >
         <svg
+          part="icon"
           xmlns="http://www.w3.org/2000/svg"
           fill="none"
           viewBox="0 0 24 24"
@@ -391,6 +344,7 @@
         <form id="add-form">
           <h3 id="add-dialog-label">Добавить аккаунт</h3>
           <input
+            part="input"
             id="add-form-label"
             type="text"
             name="add-form-label"
@@ -401,6 +355,7 @@
             autofocus
           />
           <input
+            part="input"
             id="add-form-secret"
             type="text"
             name="add-form-secret"
@@ -411,6 +366,7 @@
           />
           <div>
             <button
+              part="button"
               id="add-form-cancel"
               type="button"
               value="cancel"
@@ -418,7 +374,12 @@
             >
               Отмена
             </button>
-            <button id="add-form-submit" value="submit" formmethod="dialog">
+            <button
+              part="button"
+              id="add-form-submit"
+              value="submit"
+              formmethod="dialog"
+            >
               Добавить
             </button>
           </div>
