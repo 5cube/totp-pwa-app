@@ -1,0 +1,26 @@
+name: Build and Deploy
+
+on:
+  push:
+    branches: ["main"]
+  pull_request:
+    branches: ["main"]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v3
+      - name: Setup Node
+        uses: actions/setup-node@v3
+        with:
+          node-version: 18
+      - name: Enable corepack
+        run: corepack enable yarn
+      - name: Install deps
+        run: yarn global add wasm-pack && yarn install
+      - name: Build
+        run: yarn wasm && yarn build
+      - name: Deploy
+        run: echo "${{ github.GITHUB_REF_NAME }}-${{ github.repository }}"
