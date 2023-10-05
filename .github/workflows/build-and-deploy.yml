@@ -22,5 +22,10 @@ jobs:
         run: yarn global add wasm-pack && yarn install
       - name: Build
         run: yarn wasm && yarn build
+      - name: Setup SSH keys
+        run: |
+          install -m 600 -D /dev/null ~/.ssh/id_rsa
+          echo "${{ secrets.SSH_PRIVATE_KEY }}" > ~/.ssh/id_rsa
+          echo "${{ secrets.SSH_KNOWN_HOSTS }}" > ~/.ssh/known_hosts
       - name: Deploy
-        run: echo "${{ github.GITHUB_REF_NAME }}-${{ github.repository }}"
+        run: tar Czcvf $(dirname dist/.) - $(basename dist/.) | ssh ${{ secrets.SERVER_USERNAME }}@${{ secrets.SERVER_HOST }} "cat > ${{ secrets.SERVER_DESTINATION }}/${{ github.sha }}.tgz"
