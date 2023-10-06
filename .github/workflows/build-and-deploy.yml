@@ -28,4 +28,6 @@ jobs:
           echo "${{ secrets.SSH_PRIVATE_KEY }}" > ~/.ssh/id_rsa
           echo "${{ secrets.SSH_KNOWN_HOSTS }}" > ~/.ssh/known_hosts
       - name: Deploy
-        run: tar Czcvf $(dirname dist/.) - $(basename dist/.) | ssh ${{ secrets.SERVER_USERNAME }}@${{ secrets.SERVER_HOST }} "cat > ${{ secrets.SERVER_DESTINATION }}/${{ github.sha }}.tgz"
+        run: tar Czcvf $(dirname dist/.) - $(basename dist/.) | ssh ${{ secrets.SSH_USERNAME }}@${{ secrets.SSH_HOST }} "cat > ${{ secrets.WORK_DIR }}/build/${{ github.sha }}.tgz && tar xzvf ${{ secrets.WORK_DIR }}/build/${{ github.sha }}.tgz -C ${{ secrets.WORK_DIR }}/html"
+      - name: Cleanup
+        run: rm -rf ~/.ssh
