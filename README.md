@@ -16,37 +16,37 @@
 Сервер разработки
 
 ```bash
-yarn dev
+pnpm dev
 ```
 
 Сборка
 
 ```bash
-yarn build
+pnpm build
 ```
 
 Предпросмотр сборки
 
 ```bash
-yarn preview
+pnpm preview
 ```
 
 Форматирование
 
 ```bash
-yarn format
+pnpm format
 ```
 
 Сборка WebAssembly, см. [wasm](./wasm/README.md) для настройки необходимых инструментов
 
 ```bash
-yarn wasm
+pnpm wasm
 ```
 
 Генерация ассетов для pwa
 
 ```bash
-yarn generate-pwa-assets
+pnpm generate-pwa-assets
 ```
 
 ## TODO

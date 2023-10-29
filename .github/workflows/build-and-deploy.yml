@@ -9,19 +9,18 @@ on:
 jobs:
   build:
     runs-on: ubuntu-latest
-
     steps:
-      - uses: actions/checkout@v3
-      - name: Setup Node
+      - uses: actions/checkout@v4
+      - run: corepack enable
+      - name: Set node version to 18
         uses: actions/setup-node@v3
         with:
           node-version: 18
-      - name: Enable corepack
-        run: corepack enable yarn
+          cache: "pnpm"
       - name: Install deps
-        run: yarn global add wasm-pack && yarn install
+        run: pnpm add --global wasm-pack && pnpm install
       - name: Build
-        run: yarn wasm && yarn build
+        run: pnpm wasm && pnpm build
       - name: Setup SSH keys
         run: |
           install -m 600 -D /dev/null ~/.ssh/id_rsa
