@@ -47,7 +47,7 @@ export default class AccountCard extends HTMLElement {
   private setLabel(label: string) {
     const element = this.shadowRoot?.querySelector('label')
     if (element) {
-      element.innerHTML = label
+      element.innerHTML = decodeURIComponent(label)
     }
   }
 

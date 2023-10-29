@@ -36,11 +36,11 @@ async function renderItem(id?: string) {
       const titleElement = itemElement.querySelector(
         '[slot="title"]',
       ) as HTMLElement
-      titleElement.innerText = item.label
+      titleElement.innerText = decodeURIComponent(item.label)
     } else {
       const titleElement = document.createElement('h2')
       titleElement.setAttribute('slot', 'title')
-      titleElement.innerText = item.label
+      titleElement.innerText = decodeURIComponent(item.label)
       itemElement = document.createElement('account-item')
       itemElement.appendChild(titleElement)
       mainElement?.appendChild(itemElement)
