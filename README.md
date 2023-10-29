@@ -56,4 +56,3 @@ pnpm generate-pwa-assets
 - добавить [uri схема otpauth](https://github.com/google/google-authenticator/wiki/Key-Uri-Format), пример, otpauth://totp/ISSUER:LABEL?issuer=ISSUER&secret=SECRE&algorithm=SHA1&digits=6&period=30
 - импорт/экспорт данных
 - генерация qr-code
-- блок `<style>` в `<template>` не процесситься autoprefixer-ом

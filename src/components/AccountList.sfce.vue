@@ -1,8 +1,9 @@
+<script lang="ts">
 import { getAccounts, addAccount, deleteAccount } from '../data/db'
-import { AccountCard } from './AccountCard'
+import AccountCard from './AccountCard.sfce.vue'
 import type { AccountCreateRequest } from '../types'
 
-export class AccountList extends HTMLElement {
+export default class AccountList extends HTMLElement {
   constructor() {
     super()
   }
@@ -42,3 +43,4 @@ declare global {
     'account-list': AccountList
   }
 }
+</script>

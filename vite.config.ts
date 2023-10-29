@@ -1,11 +1,20 @@
 import { resolve } from 'node:path'
 import { defineConfig } from 'vite'
-import Inspect from 'vite-plugin-inspect'
 import { VitePWA } from 'vite-plugin-pwa'
+import vitePluginSfce from 'vite-plugin-sfce'
+import { browserslistToTargets } from 'lightningcss'
+import browserslist from 'browserslist'
 
 export default defineConfig({
   appType: 'mpa',
+  css: {
+    transformer: 'lightningcss',
+    lightningcss: {
+      targets: browserslistToTargets(browserslist()),
+    },
+  },
   build: {
+    cssMinify: 'lightningcss',
     rollupOptions: {
       input: {
         main: resolve(__dirname, 'index.html'),
@@ -13,7 +22,7 @@ export default defineConfig({
     },
   },
   plugins: [
-    Inspect(),
+    vitePluginSfce(),
     VitePWA({
       registerType: 'autoUpdate',
       workbox: {
@@ -21,6 +30,13 @@ export default defineConfig({
       },
       manifest: {
         lang: 'ru',
+        name: 'TOTP PWA',
+        short_name: 'TOTP PWA',
+        description: 'Минималистичное PWA-приложение генерации TOTP кодов',
+        theme_color: '#fafafa',
+        background_color: 'transparent',
+        orientation: 'portrait',
+        display: 'standalone',
         icons: [
           {
             src: 'pwa-64x64.png',
@@ -48,10 +64,4 @@ export default defineConfig({
       },
     }),
   ],
-  // server: {
-  //   https: {
-  //     key: './local-certificates/localhost.key',
-  //     cert: './local-certificates/localhost.crt',
-  //   },
-  // },
 })

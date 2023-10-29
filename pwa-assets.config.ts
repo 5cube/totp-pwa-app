@@ -10,7 +10,7 @@ export default defineConfig({
     appleSplashScreens: createAppleSplashScreens(
       {
         padding: 0.3,
-        resizeOptions: { background: 'white', fit: 'contain' },
+        resizeOptions: { background: '#fafafa', fit: 'contain' },
         darkResizeOptions: { background: '#18181b' },
         // by default, dark splash screens are exluded
         // darkResizeOptions: { background: 'black' },

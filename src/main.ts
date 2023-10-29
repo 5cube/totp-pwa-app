@@ -1,10 +1,10 @@
 import TimerWorker from './timer-worker?worker&inline'
-import { AccountAddDialog } from './components/AccountAddDialog'
-import { AccountCard } from './components/AccountCard'
-import { AccountCode } from './components/AccountCode'
-import { AccountItem } from './components/AccountItem'
-import { AccountList } from './components/AccountList'
-import { CountdownTimer } from './components/CountdownTimer'
+import AccountAddDialog from './components/AccountAddDialog.sfce.vue'
+import AccountCard from './components/AccountCard.sfce.vue'
+import AccountCode from './components/AccountCode.sfce.vue'
+import AccountItem from './components/AccountItem.sfce.vue'
+import AccountList from './components/AccountList.sfce.vue'
+import CountdownTimer from './components/CountdownTimer.sfce.vue'
 import { getAccount } from './data/db'
 
 customElements.define('account-add-dialog', AccountAddDialog)
@@ -21,7 +21,7 @@ async function renderItem(id?: string) {
   const headerElement = document.querySelector('header')
   const logoElement = headerElement?.querySelector('.logo')
   const backButtonElement = headerElement?.querySelector('.button-back')
-  const listElement = document.querySelector('account-list')
+  const listElement = document.querySelector<HTMLElement>('account-list')
   let itemElement = document.querySelector('account-item')
   const item = id ? await getAccount(id) : undefined
   if (item?.id) {

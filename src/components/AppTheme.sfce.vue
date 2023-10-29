@@ -1,11 +1,16 @@
-const template = document.createElement('template')
-template.innerHTML = '<input type="checkbox">'
+<template>
+  <input type="checkbox" />
+</template>
 
-export class AppTheme extends HTMLElement {
+<script lang="ts">
+export default class AppTheme extends HTMLElement {
   constructor() {
     super()
 
     const shadowRoot = this.attachShadow({ mode: 'open' })
+    const template = document.getElementById(
+      'app-theme-template',
+    ) as HTMLTemplateElement
     shadowRoot.appendChild(template.content.cloneNode(true))
 
     const inputElement = shadowRoot.querySelector('input') as HTMLInputElement
@@ -40,3 +45,4 @@ declare global {
     'app-theme': AppTheme
   }
 }
+</script>

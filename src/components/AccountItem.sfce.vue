@@ -1,7 +1,20 @@
-import { DEFAULT_PERIOD } from '../data/const'
-import { AccountList } from './AccountList'
+<template>
+  <slot name="title"></slot>
+  <section part="section">
+    <div>
+      <account-code></account-code>
+    </div>
+    <div>
+      <button part="button button-delete">Удалить</button>
+    </div>
+  </section>
+</template>
 
-export class AccountItem extends HTMLElement {
+<script lang="ts">
+import { DEFAULT_PERIOD } from '../data/const'
+import AccountList from './AccountList.sfce.vue'
+
+export default class AccountItem extends HTMLElement {
   constructor() {
     super()
 
@@ -56,3 +69,4 @@ declare global {
     'account-item': AccountItem
   }
 }
+</script>

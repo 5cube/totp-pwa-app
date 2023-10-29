@@ -15,13 +15,12 @@
   "devDependencies": {
     "@types/node": "^20.7.0",
     "@vite-pwa/assets-generator": "^0.0.10",
-    "autoprefixer": "^10.4.16",
-    "fast-glob": "^3.3.1",
-    "postcss": "^8.4.30",
+    "browserslist": "^4.22.1",
+    "lightningcss": "^1.22.0",
     "prettier": "^3.0.2",
     "typescript": "^5.0.2",
     "vite": "^4.4.5",
-    "vite-plugin-inspect": "^0.7.38",
-    "vite-plugin-pwa": "^0.16.5"
+    "vite-plugin-pwa": "^0.16.5",
+    "vite-plugin-sfce": "^0.1.3"
   }
 }
